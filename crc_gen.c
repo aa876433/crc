@@ -62,7 +62,7 @@ struct CRC_INIT_INFO_T crc_init_table[] = {
         {"CRC_16_DNP",      16, 0x3D65,     0x0000,     0xFFFF,     TRUE,  TRUE},
         {"CRC_32",          32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, TRUE,  TRUE},
         {"CRC_32_MPEG2",    32, 0x04C11DB7, 0xFFFFFFFF, 0x00000000, FALSE, FALSE},
-        {"CRC_SELF_DEFINE", 0,  0,          0,          0, 0, 0},
+        {"CRC_SELF_DEFINE", 0,  0x0,        0x0,        0x0,        FALSE, FALSE},
         };
 
 void set_crc_self_define(uint32_t degree, uint32_t poly, uint32_t init, uint32_t xor_out, uint32_t ref_in, uint32_t ref_out)
@@ -154,7 +154,7 @@ int main()
     uint8_t data[] = {0x01, 0x3a, 0x22, 0x37};
     size_t data_len = sizeof(data) / sizeof(data[0]);
     uint32_t crc_sel = CRC_SELF_DEFINE;
-    set_crc_self_define(4, 0x3, 0x6, 0, 1, 0);
+    set_crc_self_define(4, 0x3, 0x6, 0, TRUE, FALSE);
     uint32_t crc = crc_gen(data, data_len, crc_sel);
     printf("CRC: 0x%X\n", crc);
     return 0;
