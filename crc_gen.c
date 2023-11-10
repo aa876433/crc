@@ -41,7 +41,7 @@ uint8_t reverse_table[256] = {
 };
 
 struct CRC_INIT_INFO_T crc_init_table[] = {
-        {"CRC_4_ITU",       4,  0x03,       0x00,       0x00,       TRUE,  TRUE},
+        {"CRC_4_ITU",       4,  0x03,       0x01,       0x00,       TRUE,  TRUE},
         {"CRC_5_EPC",       5,  0x09,       0x09,       0x00,       FALSE, FALSE},
         {"CRC_5_ITU",       5,  0x15,       0x00,       0x00,       TRUE,  TRUE},
         {"CRC_5_USB",       5,  0x05,       0x1F,       0x1F,       TRUE,  TRUE},
@@ -63,7 +63,7 @@ struct CRC_INIT_INFO_T crc_init_table[] = {
         {"CRC_32",          32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, TRUE,  TRUE},
         {"CRC_32_MPEG2",    32, 0x04C11DB7, 0xFFFFFFFF, 0x00000000, FALSE, FALSE},
         {"CRC_SELF_DEFINE", 0,  0,          0,          0, 0, 0},
-};
+        };
 
 void set_crc_self_define(uint32_t degree, uint32_t poly, uint32_t init, uint32_t xor_out, uint32_t ref_in, uint32_t ref_out)
 {
@@ -131,12 +131,12 @@ void init_crc_table(uint32_t *crc_table, uint32_t crc_poly, uint32_t degree)
 uint32_t crc_gen(const uint8_t *data, size_t length, uint32_t crc_sel)
 {
     CRC_INIT_INFO_T crc_info = crc_init_table[crc_sel];
-    uint32_t crc = crc_info.init;
     uint32_t degree = crc_info.drgree;
-    uint32_t poly = crc_info.poly;
     uint32_t mask = degree == 32 ? 0xFFFFFFFF : ((1 << degree) - 1);
+    uint32_t poly = crc_info.poly & mask;
     uint32_t table_shift = degree > 8 ? degree - 8 : 0;
-    uint32_t result_shift = degree > 8 ? 0 : 8 - degree;
+    uint32_t crc_shift = degree > 8 ? 0 : 8 - degree;
+    uint32_t crc = (crc_info.init & mask) << crc_shift;
     uint32_t crc_table[256];
     init_crc_table(crc_table, poly, degree);
     while (length--)
@@ -144,18 +144,17 @@ uint32_t crc_gen(const uint8_t *data, size_t length, uint32_t crc_sel)
         uint8_t d = crc_info.ref_in ? reverse_byte(*data++) : *data++;
         crc = (crc << 8) ^ crc_table[((crc >> table_shift) ^ d) & 0xFF];
     }
-
-    crc = ((crc >> result_shift) & mask) ^ crc_info.xor_out;
+    crc = ((crc >> crc_shift) & mask) ^ crc_info.xor_out;
     crc = crc_info.ref_out ? reverse_bits_index(crc, degree - 1) : crc;
     return crc;
 }
 
 int main()
 {
-    uint8_t data[] = {0x55, 0x99};
+    uint8_t data[] = {0x01, 0x3a, 0x22, 0x37};
     size_t data_len = sizeof(data) / sizeof(data[0]);
     uint32_t crc_sel = CRC_SELF_DEFINE;
-    set_crc_self_define(32, 0x29, 0x3ff, 0, 1, 0);
+    set_crc_self_define(4, 0x3, 0x6, 0, 1, 0);
     uint32_t crc = crc_gen(data, data_len, crc_sel);
     printf("CRC: 0x%X\n", crc);
     return 0;
