@@ -5,8 +5,11 @@ This project encompasses a C language tool designed for generating a range of cy
 Features:
 
 • Supports up to 21 different CRC standards.
+
 • Includes CRC algorithms ranging from 4 to 32 bits.
+
 • Handles both standard and non-standard initial values, polynomials, and reflected bit operations.
   Offers flexible input by allowing the selection of different CRC algorithms through modifying an enumeration value in the code.
+  
 • Custom Parameter Definition - Enhances the tool by allowing users to define custom parameters for generating CRC codes. 
   This includes the ability to specify unique polynomial values, initial values, and control over bit reflection operations, enabling more tailored and specific CRC calculations according to user requirements.
