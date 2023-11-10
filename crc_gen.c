@@ -28,6 +28,7 @@ enum
     CRC_16_DNP,
     CRC_32,
     CRC_32_MPEG2,
+    CRC_SELF_DEFINE,
 };
 
 typedef struct CRC_INIT_INFO_T
@@ -43,29 +44,40 @@ typedef struct CRC_INIT_INFO_T
 
 
 struct CRC_INIT_INFO_T crc_init_table[] = {
-        {"CRC_4_ITU",      4,  0x03,       0x00,       0x00,       TRUE,  TRUE},
-        {"CRC_5_EPC",      5,  0x09,       0x09,       0x00,       FALSE, FALSE},
-        {"CRC_5_ITU",      5,  0x15,       0x00,       0x00,       TRUE,  TRUE},
-        {"CRC_5_USB",      5,  0x05,       0x1F,       0x1F,       TRUE,  TRUE},
-        {"CRC_6_ITU",      6,  0x03,       0x00,       0x00,       TRUE,  TRUE},
-        {"CRC_7_MMC",      7,  0x09,       0x00,       0x00,       FALSE, FALSE},
-        {"CRC_8",          8,  0x07,       0x00,       0x00,       FALSE, FALSE},
-        {"CRC_8_ITU",      8,  0x07,       0x00,       0x55,       FALSE, FALSE},
-        {"CRC_8_ROHC",     8,  0x07,       0xFF,       0x00,       TRUE,  TRUE},
-        {"CRC_8_MAXIM",    8,  0x31,       0x00,       0x00,       TRUE,  TRUE},
-        {"CRC_16_IBM",     16, 0x8005,     0x0000,     0x0000,     TRUE,  TRUE},
-        {"CRC_16_MAXIM",   16, 0x8005,     0x0000,     0xFFFF,     TRUE,  TRUE},
-        {"CRC_16_USB",     16, 0x8005,     0xFFFF,     0XFFFF,     TRUE,  TRUE},
-        {"CRC_16_MODBUS",  16, 0x8005,     0xFFFF,     0x0000,     TRUE,  TRUE},
-        {"CRC_16_CCITT",   16, 0x1021,     0x0000,     0x0000,     TRUE,  TRUE},
-        {"CRC_16_CCITT_F", 16, 0x1021,     0xFFFF,     0x0000,     FALSE, FALSE},
-        {"CRC_16_X25",     16, 0x1021,     0xFFFF,     0xFFFF,     TRUE,  TRUE},
-        {"CRC_16_XMODEM",  16, 0x1021,     0x0000,     0x0000,     FALSE, FALSE},
-        {"CRC_16_DNP",     16, 0x3D65,     0x0000,     0xFFFF,     TRUE, TRUE},
-        {"CRC_32",         32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, TRUE,  TRUE},
-        {"CRC_32_MPEG2",   32, 0x04C11DB7, 0xFFFFFFFF, 0x00000000, FALSE, FALSE},
+        {"CRC_4_ITU",       4,  0x03,       0x00,       0x00,       TRUE,  TRUE},
+        {"CRC_5_EPC",       5,  0x09,       0x09,       0x00,       FALSE, FALSE},
+        {"CRC_5_ITU",       5,  0x15,       0x00,       0x00,       TRUE,  TRUE},
+        {"CRC_5_USB",       5,  0x05,       0x1F,       0x1F,       TRUE,  TRUE},
+        {"CRC_6_ITU",       6,  0x05,       0x00,       0x00,       FALSE, FALSE},
+        {"CRC_7_MMC",       7,  0x09,       0x00,       0x00,       FALSE, FALSE},
+        {"CRC_8",           8,  0x07,       0x00,       0x00,       FALSE, FALSE},
+        {"CRC_8_ITU",       8,  0x07,       0x00,       0x55,       FALSE, FALSE},
+        {"CRC_8_ROHC",      8,  0x07,       0xFF,       0x00,       TRUE,  TRUE},
+        {"CRC_8_MAXIM",     8,  0x9,        0x01,       0x00,       TRUE,  FALSE},
+        {"CRC_16_IBM",      16, 0x8005,     0x0000,     0x0000,     TRUE,  TRUE},
+        {"CRC_16_MAXIM",    16, 0x8005,     0x0000,     0xFFFF,     TRUE,  TRUE},
+        {"CRC_16_USB",      16, 0x8005,     0xFFFF,     0XFFFF,     TRUE,  TRUE},
+        {"CRC_16_MODBUS",   16, 0x8005,     0xFFFF,     0x0000,     TRUE,  TRUE},
+        {"CRC_16_CCITT",    16, 0x1021,     0x0000,     0x0000,     TRUE,  TRUE},
+        {"CRC_16_CCITT_F",  16, 0x1021,     0xFFFF,     0x0000,     FALSE, FALSE},
+        {"CRC_16_X25",      16, 0x1021,     0xFFFF,     0xFFFF,     TRUE,  TRUE},
+        {"CRC_16_XMODEM",   16, 0x1021,     0x0000,     0x0000,     FALSE, FALSE},
+        {"CRC_16_DNP",      16, 0x3D65,     0x0000,     0xFFFF,     TRUE,  TRUE},
+        {"CRC_32",          32, 0x04C11DB7, 0xFFFFFFFF, 0xFFFFFFFF, TRUE,  TRUE},
+        {"CRC_32_MPEG2",    32, 0x04C11DB7, 0xFFFFFFFF, 0x00000000, FALSE, FALSE},
+        {"CRC_SELF_DEFINE", 0,  0,          0,          0, 0, 0},
 };
 
+void
+set_crc_self_define(uint32_t degree, uint32_t poly, uint32_t init, uint32_t xor_out, uint32_t ref_in, uint32_t ref_out)
+{
+    crc_init_table[CRC_SELF_DEFINE].drgree = degree;
+    crc_init_table[CRC_SELF_DEFINE].poly = poly;
+    crc_init_table[CRC_SELF_DEFINE].init = init;
+    crc_init_table[CRC_SELF_DEFINE].xor_out = xor_out;
+    crc_init_table[CRC_SELF_DEFINE].ref_in = ref_in;
+    crc_init_table[CRC_SELF_DEFINE].ref_out = ref_out;
+}
 
 uint8_t reverse_byte(uint8_t data)
 {
@@ -123,22 +135,6 @@ void init_crc_table(uint32_t *crc_table, uint32_t crc_poly, uint32_t degree)
     }
 }
 
-
-uint32_t crc_n(const uint8_t *data, size_t length, uint32_t crc_poly, uint32_t degree)
-{
-    uint32_t crc = 0;
-    uint32_t mask = degree == 32 ? 0xFFFFFFFF : ((1 << degree) - 1);
-    uint32_t crc_table[256];
-    uint32_t table_shift = degree > 8 ? degree - 8 : 0;
-    uint32_t result_shift = degree > 8 ? 0 : 8 - degree;
-    init_crc_table(crc_table, crc_poly, degree);
-    while (length--)
-    {
-        crc = (crc << 8) ^ crc_table[((crc >> table_shift) ^ *data++) & 0xFF];
-    }
-    return (crc >> result_shift) & mask;
-}
-
 uint32_t crc_gen(const uint8_t *data, size_t length, uint32_t crc_sel)
 {
     CRC_INIT_INFO_T crc_info = crc_init_table[crc_sel];
@@ -159,18 +155,15 @@ uint32_t crc_gen(const uint8_t *data, size_t length, uint32_t crc_sel)
     crc = ((crc >> result_shift) & mask) ^ crc_info.xor_out;
     crc = crc_info.ref_out ? reverse_bits_index(crc, degree - 1) : crc;
     return crc;
-
 }
 
 int main()
 {
-
-    uint8_t data[] = {0xaa, 0x33, 0x23, 0x4a, 0x99, 0x12, 0xf2};
+    uint8_t data[] = {0x55, 0x99};
     size_t data_len = sizeof(data) / sizeof(data[0]);
-    uint32_t crc_sel = CRC_16_MODBUS;
+    uint32_t crc_sel = CRC_SELF_DEFINE;
+    set_crc_self_define(32, 0x9, 0xff, 0, 1, 0);
     uint32_t crc = crc_gen(data, data_len, crc_sel);
-//    uint32_t crc = crc_n(data, data_len, 0x04C11DB7, 32);
     printf("CRC: 0x%X\n", crc);
-
     return 0;
 }
